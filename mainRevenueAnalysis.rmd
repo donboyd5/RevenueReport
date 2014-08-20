@@ -12,10 +12,11 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r defines}
+```{r defines, echo=FALSE}
 # sessionInfo()
 
 qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
+qtdrop <- "C:\\Users\\Don\\Dropbox (Personal)\\R items\\qtax\\"
 
  
 ```
@@ -23,26 +24,27 @@ qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
 
 
 
-```{r updateapidata, eval=FALSE}
+```{r updateapidata, eval=FALSE, echo=FALSE}
 source("getupdatedqtaxfromapi.r", echo=TRUE) 
 
 ```
 
 
 
-```{r combineapihist, eval=FALSE}
+```{r combineapihist, eval=FALSE, echo=FALSE}
 source("combineqtaxhistapi.r", echo=TRUE) 
 
 ```
 
 
 
-```{r getbasedata}
+```{r getbasedata, echo=FALSE}
 # library(hts) #  Hierarchical and grouped time series
 # qtd <- "C:\\Users\\Don\\Dropbox (Personal)\\sharedData\\Data for ongoing work\\qtax rfiles\\"
 
-qth <- readRDS(paste0(qtd, "qtaxhistory_best.rds"))
-ht(qth)
+qtax <- readRDS(paste0(qtd, "qtaxall.rds"))
+ht(qtax)
+count(qtax, "date")
 
 # qtax <- getdata("qtax")
 # ht(qtax)
@@ -57,7 +59,7 @@ plot(cars)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 
-```{r eval=FALSE}
+```{r eval=FALSE, echo=FALSE}
 
 #****************************************************************************************************
 #
