@@ -17,7 +17,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
 
-
+ 
 ```
 
 
