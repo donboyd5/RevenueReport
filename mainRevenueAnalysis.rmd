@@ -1,0 +1,86 @@
+---
+title: "Quarterly State Tax Revenue Analysis"
+author: "Don Boyd"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r defines}
+# sessionInfo()
+
+qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
+
+
+```
+
+
+
+
+```{r updateapidata, eval=FALSE}
+source("getupdatedqtaxfromapi.r", echo=TRUE) 
+
+```
+
+
+
+```{r combineapihist, eval=FALSE}
+source("combineqtaxhistapi.r", echo=TRUE) 
+
+```
+
+
+
+```{r getbasedata}
+# library(hts) #  Hierarchical and grouped time series
+# qtd <- "C:\\Users\\Don\\Dropbox (Personal)\\sharedData\\Data for ongoing work\\qtax rfiles\\"
+
+qth <- readRDS(paste0(qtd, "qtaxhistory_best.rds"))
+ht(qth)
+
+# qtax <- getdata("qtax")
+# ht(qtax)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r eval=FALSE}
+
+#****************************************************************************************************
+#
+#                Mess around ####
+#
+#***************************************************************************************************
+
+The process is actually pretty simple. It is as follows assuming you have already set up a local github repository in Rstudio.
+
+go to github.com and click repositories and new repository
+Give the repository a name and description and create it
+Follow the instructions to “push an existing repository from the command line”
+For example if the repository was called foo, the commands would be:
+
+git remote add origin https://github.com/donboyd5/RevenueReport.git
+git push -u origin master
+
+Thus, in Rstudio, you could open the shell while in your project. This would ensure that the shell is open in the working directory of your project, and then run the previous commands (naturally with the correct repository name) .
+
+The only final problem I encountered was that I had not used github for a while and github did not have my SSH key. So I needed to add my SSH key to github. To do this:
+
+In Rstudio click “preferences” and “view public key” and copy the whole key to the clipboard
+In Github, click “edit user profile” and “SSH keys” and add the key.
+
+```
+
