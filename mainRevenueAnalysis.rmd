@@ -9,7 +9,6 @@ output:
 ---
 
 
-# Analysis of quarterly tax data from Census Bureau
 
 ```{r defines, echo=FALSE}
 
@@ -58,17 +57,15 @@ source("prepdata.r", echo=TRUE)
 ```{r getbasedata, echo=FALSE}
 # library(hts) #  Hierarchical and grouped time series
 # qtd <- "C:\\Users\\Don\\Dropbox (Personal)\\sharedData\\Data for ongoing work\\qtax rfiles\\"
+qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
 
-qtax <- readRDS(paste0(qtd, "qtaxall.rds"))
-ht(qtax)
-count(qtax, "date")
-
-# qtax <- getdata("qtax")
 # ht(qtax)
+# count(qtax, "date")
+
 ```
 
 
-```{r intro, child=paste0("subIntro.Rmd"), eval=FALSE}
+```{r intro, child=paste0("subIntro.Rmd"), eval=TRUE}
 # don't put anything else here - it WILL NOT BE RUN!
 ```
 

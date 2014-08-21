@@ -4,18 +4,44 @@ author: "Don Boyd"
 
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
 ```{r}
-summary(cars)
+qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
+ht(qtax)
+# count(qtax, c("vname", "ic", "vdesc"))
+
+# make long file, get pchyas and diff from 2007-10-01 then graph
+dfl <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4)
+ht(dfl)
+idx <- with(dfl, match(paste(stabbr, "2007-10-01", level, valtype, vname),
+                       paste(stabbr, date, level, valtype, vname)))
+dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
+
 ```
 
-You can also embed plots, for example:
+# Some plots of taxes
+## 4q MA of real taxes by type, indexed to recession start, US
+```{r}
+txs <- c("tottax", "iit", "gst", "cit")
+qplot(date, pdiff, data=dfl %>%
+        filter(stabbr=="US" & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
+        colour=vname, geom=c("point", "line")) + geom_hline(y=0)
 
-```{r, echo=FALSE}
-plot(cars)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## 4q MA of real total taxes for selected states, indexed to recession start
+```{r}
+txs <- c("tottax")
+sts <- c("US", "CA", "NY", "TX", "FL")
+qplot(date, pdiff, data=dfl %>%
+        filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
+        colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
+
+sts <- c("US", "NJ", "KS", "IL", "SC")
+qplot(date, pdiff, data=dfl %>%
+        filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
+        colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
+
+
+```
+
