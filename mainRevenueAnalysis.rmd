@@ -8,20 +8,32 @@ output:
     toc_depth: 4
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Analysis of quarterly tax data from Census Bureau
 
 ```{r defines, echo=FALSE}
-# sessionInfo()
 
 qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
 qtdrop <- "C:\\Users\\Don\\Dropbox (Personal)\\R items\\qtax\\"
-
  
 ```
 
 
+```{r loads, echo=FALSE}
+library(btools) # library that I created (see above for installation)
+library(foreign) # various import and export routines - e.g., for reading Stata files
+library(gdata) # for reading spreadsheets
+library(ggplot2)
+library(scales) # so we can use scales with ggplot2
+library(plyr) # needed for ddply [but was it already loaded??]
+library(reshape2)
+library(tidyr)
+library(dplyr) # always load AFTER plyr
+library(knitr)
+
+# sessionInfo()
+
+```
 
 
 ```{r updateapidata, eval=FALSE, echo=FALSE}
@@ -30,10 +42,15 @@ source("getupdatedqtaxfromapi.r", echo=TRUE)
 ```
 
 
-
 ```{r combineapihist, eval=FALSE, echo=FALSE}
 source("combineqtaxhistapi.r", echo=TRUE) 
 
+```
+
+
+```{r prepdata, eval=FALSE, echo=FALSE}
+# get price index, compute real, and compute ma4 and maybe pchya
+source("prepdata.r", echo=TRUE) 
 ```
 
 
@@ -50,13 +67,11 @@ count(qtax, "date")
 # ht(qtax)
 ```
 
-You can also embed plots, for example:
 
-```{r, echo=FALSE}
-plot(cars)
+```{r intro, child=paste0("subIntro.Rmd"), eval=FALSE}
+# don't put anything else here - it WILL NOT BE RUN!
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 
 ```{r eval=FALSE, echo=FALSE}
