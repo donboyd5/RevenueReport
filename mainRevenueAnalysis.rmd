@@ -36,18 +36,22 @@ library(knitr)
 
 
 ```{r updateapidata, eval=FALSE, echo=FALSE}
+# only run this when Census has updated the quarterly tax data
 source("getupdatedqtaxfromapi.r", echo=TRUE) 
 
 ```
 
 
 ```{r combineapihist, eval=FALSE, echo=FALSE}
+# only run this when Census has updated the quarterly tax data
 source("combineqtaxhistapi.r", echo=TRUE) 
 
 ```
 
 
 ```{r prepdata, eval=FALSE, echo=FALSE}
+# only run this when Census has updated the quarterly tax data
+# or when I want to add to the variables and information we want to analyze
 # get price index, compute real, and compute ma4 and maybe pchya
 source("prepdata.r", echo=TRUE) 
 ```
@@ -56,7 +60,7 @@ source("prepdata.r", echo=TRUE)
 
 ```{r getbasedata, echo=FALSE}
 # library(hts) #  Hierarchical and grouped time series
-# qtd <- "C:\\Users\\Don\\Dropbox (Personal)\\sharedData\\Data for ongoing work\\qtax rfiles\\"
+# get the main file once, centrally, and all subprograms can use this
 qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
 
 # ht(qtax)

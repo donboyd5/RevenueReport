@@ -5,8 +5,8 @@ author: "Don Boyd"
 ---
 
 ```{r}
-qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
-ht(qtax)
+# qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
+# ht(qtax)
 # count(qtax, c("vname", "ic", "vdesc"))
 
 # make long file, get pchyas and diff from 2007-10-01 then graph
