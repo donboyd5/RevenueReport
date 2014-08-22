@@ -5,6 +5,28 @@
 # https://www.census.gov/geo/reference/county-adjacency.html
 
 # https://github.com/ubikuity/List-of-neighboring-states-for-each-US-state
+# from ubikuity
+fn <- "neighbors-states.csv"
+df <- read.csv(paste0(qtd, fn), sep=";")
+str(df)
+names(df) <- c("stabbr", "nstabbr")
+
+# this is odd, he does not have duplicates
+st <- "RI"
+filter(df, stabbr==st)
+filter(df, nstabbr==st)
+
+df2 <- df[, c("nstabbr", "stabbr")]
+names(df2) <- c("stabbr", "nstabbr")
+df3 <- rbind(df, df2)
+df3 <- unique(df3)
+
+st <- "CO"
+filter(df3, stabbr==st)
+filter(df3, nstabbr==st)
+
+saveRDS(df3, paste0(qtd, "stateneighbors.rds"))
+
 
 ubase <- "https://www.census.gov/geo/reference/docs/"
 fn <- "county_adjacency.txt"
