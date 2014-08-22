@@ -4,6 +4,8 @@
 
 # https://www.census.gov/geo/reference/county-adjacency.html
 
+# https://github.com/ubikuity/List-of-neighboring-states-for-each-US-state
+
 ubase <- "https://www.census.gov/geo/reference/docs/"
 fn <- "county_adjacency.txt"
 
