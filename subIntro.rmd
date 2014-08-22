@@ -16,6 +16,9 @@ idx <- with(dfl, match(paste(stabbr, "2007-10-01", level, valtype, vname),
                        paste(stabbr, date, level, valtype, vname)))
 dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
+# get state neighbors
+nb <- readRDS(paste0(qtd, "stateneighbors.rds"))
+
 ```
 
 # Some plots of taxes
@@ -41,6 +44,14 @@ sts <- c("US", "NJ", "KS", "IL", "SC")
 qplot(date, pdiff, data=dfl %>%
         filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
         colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
+
+# get a state and its neighbors
+st <- "KS"
+sts <- c(st, as.character(nb[nb$stabbr==st, "nstabbr"]))
+qplot(date, pdiff, data=dfl %>%
+        filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
+        colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
+
 
 
 ```
