@@ -29,6 +29,7 @@ library(reshape2)
 library(tidyr)
 library(dplyr) # always load AFTER plyr
 library(knitr)
+library(lubridate)
 
 # sessionInfo()
 

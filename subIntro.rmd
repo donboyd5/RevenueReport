@@ -10,16 +10,37 @@ author: "Don Boyd"
 # count(qtax, c("vname", "ic", "vdesc"))
 
 # make long file, get pchyas and diff from 2007-10-01 then graph
-dfl <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4)
+dfl <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
+  arrange(valtype, stabbr, vname, level, date)
 ht(dfl)
 idx <- with(dfl, match(paste(stabbr, "2007-10-01", level, valtype, vname),
                        paste(stabbr, date, level, valtype, vname)))
 dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
+idx <- with(dfl, match(paste(stabbr, date - years(1), level, valtype, vname),
+                       paste(stabbr, date, level, valtype, vname)))
+dfl$pchya <- with(dfl, taxval / taxval[idx] * 100 - 100)
+
 # get state neighbors
 nb <- readRDS(paste0(qtd, "stateneighbors.rds"))
 
+lq <- max(dfl$date)
 ```
+
+
+# Pchya
+## Latest quarter (beginning `r lq`), total tax, ranked
+```{r}
+
+tab <- dfl %>% filter(vname=="tottax" & level=="sg" & valtype=="value" & date==lq)
+tab <- tab %>% arrange(-pchya) %>% select(stabbr, pchya)
+kable(tab, digits=2)
+
+```
+
+
+
+
 
 # Some plots of taxes
 ## 4q MA of real taxes by type, indexed to recession start, US
