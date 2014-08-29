@@ -32,6 +32,7 @@ dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 idx <- with(dfl, match(paste(geotype, region, stabbr, date - years(1), level, valtype, vname),
                        paste(geotype, region, stabbr, date, level, valtype, vname)))
+
 dfl$pchya <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 # get state neighbors
