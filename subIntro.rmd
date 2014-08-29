@@ -11,6 +11,7 @@ author: "Don Boyd"
 
 
 # make long file, get pchyas and diff from 2007-10-01 then graph
+<<<<<<< HEAD
 
 dfs <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
   mutate(stname=getstname(stabbr), 
@@ -32,6 +33,17 @@ dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 idx <- with(dfl, match(paste(geotype, region, stabbr, date - years(1), level, valtype, vname),
                        paste(geotype, region, stabbr, date, level, valtype, vname)))
+=======
+dfl <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
+  arrange(valtype, stabbr, vname, level, date)
+ht(dfl)
+idx <- with(dfl, match(paste(stabbr, "2007-10-01", level, valtype, vname),
+                       paste(stabbr, date, level, valtype, vname)))
+dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
+
+idx <- with(dfl, match(paste(stabbr, date - years(1), level, valtype, vname),
+                       paste(stabbr, date, level, valtype, vname)))
+>>>>>>> 10548340705b5568eef057271bcb1c5571475621
 dfl$pchya <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 # get state neighbors
