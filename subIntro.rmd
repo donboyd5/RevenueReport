@@ -32,7 +32,6 @@ dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 idx <- with(dfl, match(paste(geotype, region, stabbr, date - years(1), level, valtype, vname),
                        paste(geotype, region, stabbr, date, level, valtype, vname)))
-
 dfl$pchya <- with(dfl, taxval / taxval[idx] * 100 - 100)
 
 # get state neighbors
@@ -46,8 +45,8 @@ lq <- max(dfl$date)
 ## Latest quarter (beginning `r lq`), total tax, ranked
 ```{r}
 
-tab <- dfl %>% filter(vname=="tottax" & level=="sg" & valtype=="value" & date==lq)
-tab <- tab %>% arrange(-pchya) %>% select(stabbr, pchya)
+tab <- dfl %>% filter(geotype=="state" & vname=="tottax" & level=="sg" & valtype=="value" & date==lq)
+tab <- tab %>% arrange(-pchya) %>% select(stname, pchya)
 kable(tab, digits=2)
 
 ```
