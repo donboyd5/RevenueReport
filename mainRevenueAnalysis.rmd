@@ -59,15 +59,47 @@ source("prepdata.r", echo=TRUE)
 
 
 
-```{r getbasedata, echo=FALSE}
+```{r getbasedata, echo=FALSE, cache=TRUE}
 # library(hts) #  Hierarchical and grouped time series
 # get the main file once, centrally, and all subprograms can use this
 qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
 
 # ht(qtax)
-# count(qtax, "date")
+# count(qtax, c("vname", "ic", "vdesc"))
 
+
+# make long file, get pchyas and diff from 2007-10-01 then graph
+
+dfs <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
+  mutate(stname=getstname(stabbr), 
+         region=as.character(factor(stabbr, levels=stcodes$stabbr, labels=stcodes$beargn.name)),
+         geotype="state") %>%
+  arrange(valtype, stabbr, vname, level, date)
+ht(dfs)
+# create region-level summaries and add them to the data before calcing pdiff and pchya
+
+dfr <- dfs %>% group_by(valtype, region, vname, level, date) %>%
+  summarise(taxval=sum(taxval, na.rm=TRUE)) %>%
+  mutate(geotype="region")
+
+dfl <- rbind.fill(dfs, dfr)
+
+idx <- with(dfl, match(paste(geotype, region, stabbr, "2007-10-01", level, valtype, vname),
+                       paste(geotype, region, stabbr, date, level, valtype, vname)))
+dfl$pdiff <- with(dfl, taxval / taxval[idx] * 100 - 100)
+
+idx <- with(dfl, match(paste(geotype, region, stabbr, date - years(1), level, valtype, vname),
+                       paste(geotype, region, stabbr, date, level, valtype, vname)))
+dfl$pchya <- with(dfl, taxval / taxval[idx] * 100 - 100)
+
+# get state neighbors
+nb <- readRDS(paste0(qtd, "stateneighbors.rds"))
+
+lq <- max(dfl$date)
 ```
+
+
+
 
 
 ```{r intro, child=paste0("subIntro.Rmd"), eval=TRUE}
