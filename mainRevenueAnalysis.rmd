@@ -18,7 +18,7 @@ qtdrop <- "C:\\Users\\Don\\Dropbox (Personal)\\R items\\qtax\\"
 ```
 
 
-```{r loads, echo=FALSE}
+```{r loads, echo=FALSE, message=FALSE}
 library(btools) # library that I created (see above for installation)
 library(foreign) # various import and export routines - e.g., for reading Stata files
 library(gdata) # for reading spreadsheets
@@ -59,7 +59,7 @@ source("prepdata.r", echo=TRUE)
 
 
 
-```{r getbasedata, echo=FALSE, cache=TRUE}
+```{r getbasedata, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 # library(hts) #  Hierarchical and grouped time series
 # get the main file once, centrally, and all subprograms can use this
 qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
@@ -75,7 +75,7 @@ dfs <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
          region=as.character(factor(stabbr, levels=stcodes$stabbr, labels=stcodes$beargn.name)),
          geotype="state") %>%
   arrange(valtype, stabbr, vname, level, date)
-ht(dfs)
+# ht(dfs)
 # create region-level summaries and add them to the data before calcing pdiff and pchya
 
 dfr <- dfs %>% group_by(valtype, region, vname, level, date) %>%
@@ -101,14 +101,13 @@ lq <- max(dfl$date)
 
 
 
-
 ```{r intro, child=paste0("subIntro.Rmd"), eval=TRUE}
 # don't put anything else here - it WILL NOT BE RUN!
 ```
 
 
 
-```{r eval=FALSE, echo=FALSE}
+```{r eval=FALSE, echo=FALSE, message=FALSE}
 
 #****************************************************************************************************
 #

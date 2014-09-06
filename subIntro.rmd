@@ -7,21 +7,20 @@ author: "Don Boyd"
 
 # Pchya
 ## Latest quarter (beginning `r lq`), total tax, ranked
-```{r}
+```{r, echo=FALSE}
 
 txs <- c("tottax", "iit", "gst", "cit")
-
-cat("\nStates\n")
-tab <- dfl %>% filter(geotype=="state" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
-  select(stname, vname, pchya) %>%
-  spread(vname, pchya) %>% 
-  arrange(-tottax)
-kable(tab, digits=2)
-
 
 cat("\nRegions\n")
 tab <- dfl %>% filter(geotype=="region" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
   select(region, vname, pchya) %>%
+  spread(vname, pchya) %>% 
+  arrange(-tottax)
+kable(tab, digits=2)
+
+cat("\nStates\n")
+tab <- dfl %>% filter(geotype=="state" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
+  select(stname, vname, pchya) %>%
   spread(vname, pchya) %>% 
   arrange(-tottax)
 kable(tab, digits=2)
@@ -34,6 +33,31 @@ kable(tab, digits=2)
 
 
 # Some plots of taxes
+## Actual and 4q MA
+```{r, echo=FALSE}
+# ht(dfl)
+# count(dfl, "valtype")
+tmp <- dfl %>% filter(valtype %in% c("valma4", "value") & level=="sg" & geotype=="state") %>%
+  select(stabbr, date, vname, valtype, taxval)
+
+cat("\nTotal tax\n")
+qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="tottax" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
+
+cat("\nIndividual income tax\n")
+qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="iit" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
+
+cat("\nGeneral sales tax\n")
+qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="gst" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
+
+cat("\nCorporate income tax\n")
+qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="cit" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
+
+
+```
+
+
+
+
 ## 4q MA of real taxes by type, indexed to recession start, US
 ```{r}
 txs <- c("tottax", "iit", "gst", "cit")
