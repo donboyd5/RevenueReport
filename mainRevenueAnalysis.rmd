@@ -8,12 +8,24 @@ output:
     toc_depth: 4
 ---
 
+```{r, eval=FALSE, echo=FALSE}
+# When we want a final report, run the following code selectively "by hand" (interactively) -- NEVER using Knit with eval=TRUE
+rmdfn <- "E:\\Dropbox (Personal)\\RPrograms PC\\RevenueReport\\mainRevenueAnalysis.rmd"  # this file
+outfn <- paste0("RevenueReport_", format(Sys.time(), "%Y-%m-%d"), ".html")
+rmarkdown::render(rmdfn, output_format="html_document", output_file=outfn)
+
+# I have tried MANY approaches to writing the rendered file to a different directory, but they have not worked.
+# outdir <- "E:\\RIG\\SRR\\"
+# rmarkdown::render("E:\\Dropbox (Personal)\\RPrograms PC\\RevenueReport\\mainRevenueAnalysis.rmd", output_format="html_document", output_file=outfn, output_dir=outdir, intermediates_dir=outdir)
+
+```
 
 
 ```{r defines, echo=FALSE}
 
 qtd <- paste0(sdatd, "Data for ongoing work\\qtax rfiles\\")
-qtdrop <- "C:\\Users\\Don\\Dropbox (Personal)\\R items\\qtax\\"
+# qtdrop <- "C:\\Users\\Don\\Dropbox (Personal)\\R items\\qtax\\"
+qtdrop <- "E:\\Dropbox (Personal)\\R items\\qtax\\"
  
 ```
 
