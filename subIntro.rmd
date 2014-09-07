@@ -5,7 +5,7 @@ author: "Don Boyd"
 ---
 
 # Values
-```{r}
+```{r, echo=FALSE}
 txs <- c("tottax", "iit", "gst", "cit", "xigc")
 
 cat("\nTaxes in $ billions\n")
@@ -38,7 +38,7 @@ tab <- dfl %>% filter(geotype=="state" & vname %in% txs & level=="sg" & valtype=
   select(stname, vname, pchya) %>%
   spread(vname, pchya) %>% 
   arrange(-tottax) %>%
-  select(region, eval(uvf(txs)))
+  select(stname, eval(uvf(txs)))
 kable(tab, digits=2)
 
 ```
@@ -77,7 +77,7 @@ qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="xigc" & date>="2000-
 
 
 ## 4q MA of real taxes by type, indexed to recession start, US
-```{r}
+```{r, echo=FALSE}
 txs <- c("tottax", "iit", "gst", "cit", "xigc")
 qplot(date, pdiff, data=dfl %>%
         filter(stabbr=="US" & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
@@ -87,7 +87,7 @@ qplot(date, pdiff, data=dfl %>%
 
 
 ## 4q MA of real total taxes for selected states, indexed to recession start
-```{r}
+```{r, echo=FALSE}
 txs <- c("tottax")
 sts <- c("US", "CA", "NY", "TX", "FL")
 qplot(date, pdiff, data=dfl %>%
