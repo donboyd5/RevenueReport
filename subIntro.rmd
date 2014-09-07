@@ -4,27 +4,42 @@ author: "Don Boyd"
 
 ---
 
+# Values
+```{r}
+txs <- c("tottax", "iit", "gst", "cit", "xigc")
+
+cat("\nTaxes in $ billions\n")
+tab <- dfl %>% filter(geotype=="region" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
+  mutate(taxval=taxval / 1000) %>%
+  select(region, vname, taxval) %>%
+  spread(vname, taxval) %>% 
+  arrange(-tottax) %>%
+  select(region, eval(uvf(txs)))
+kable(tab, digits=2)
+```
+
 
 # Pchya
 ## Latest quarter (beginning `r lq`), total tax, ranked
 ```{r, echo=FALSE}
 
-txs <- c("tottax", "iit", "gst", "cit")
+txs <- c("tottax", "iit", "gst", "cit", "xigc")
 
 cat("\nRegions\n")
 tab <- dfl %>% filter(geotype=="region" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
   select(region, vname, pchya) %>%
   spread(vname, pchya) %>% 
-  arrange(-tottax)
+  arrange(-tottax) %>%
+  select(region, eval(uvf(txs)))
 kable(tab, digits=2)
 
 cat("\nStates\n")
 tab <- dfl %>% filter(geotype=="state" & vname %in% txs & level=="sg" & valtype=="value" & date==lq) %>%
   select(stname, vname, pchya) %>%
   spread(vname, pchya) %>% 
-  arrange(-tottax)
+  arrange(-tottax) %>%
+  select(region, eval(uvf(txs)))
 kable(tab, digits=2)
-
 
 ```
 
@@ -52,6 +67,9 @@ qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="gst" & date>="2000-0
 cat("\nCorporate income tax\n")
 qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="cit" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
 
+cat("\nTaxes other than big 3\n")
+qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="xigc" & date>="2000-01-01"), colour=valtype, geom=c("line", "point"))
+
 
 ```
 
@@ -60,7 +78,7 @@ qplot(date, taxval, data=subset(tmp, stabbr=="US" & vname=="cit" & date>="2000-0
 
 ## 4q MA of real taxes by type, indexed to recession start, US
 ```{r}
-txs <- c("tottax", "iit", "gst", "cit")
+txs <- c("tottax", "iit", "gst", "cit", "xigc")
 qplot(date, pdiff, data=dfl %>%
         filter(stabbr=="US" & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
         colour=vname, geom=c("point", "line")) + geom_hline(y=0)
@@ -87,8 +105,6 @@ sts <- c(st, nb[nb$stabbr==st, "nstabbr"])
 qplot(date, pdiff, data=dfl %>%
         filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
         colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
-
-
 
 ```
 

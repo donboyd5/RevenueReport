@@ -31,7 +31,7 @@ qtdrop <- "E:\\Dropbox (Personal)\\R items\\qtax\\"
 
 
 ```{r loads, echo=FALSE, message=FALSE}
-library(btools) # library that I created (see above for installation)
+library(btools) # library that I created (install from github)
 library(foreign) # various import and export routines - e.g., for reading Stata files
 library(gdata) # for reading spreadsheets
 library(ggplot2)
@@ -79,8 +79,7 @@ qtax <- readRDS(file=paste0(qtd, "qtaxrma.rds"))
 # ht(qtax)
 # count(qtax, c("vname", "ic", "vdesc"))
 
-
-# make long file, get pchyas and diff from 2007-10-01 then graph
+# make long file, get pchyas and diff from 2007-10-01
 
 dfs <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
   mutate(stname=getstname(stabbr), 
@@ -88,13 +87,27 @@ dfs <- qtax %>% gather(valtype, taxval, value, rvalue, valma4, rvalma4) %>%
          geotype="state") %>%
   arrange(valtype, stabbr, vname, level, date)
 # ht(dfs)
-# create region-level summaries and add them to the data before calcing pdiff and pchya
+# now create a non-(iit, gst, cit) value
+xigc <- dfs %>% filter(vname %in% c("tottax", "iit", "gst", "cit")) %>% 
+  select(-vdesc, -ic) %>%
+  spread(vname, taxval) %>%
+  mutate(taxval=tottax - naz(iit) - naz(gst) - naz(cit), 
+         vname="xigc", vdesc="Total tax excluding iit, gst, and cit") %>%
+  select(-cit, -gst, - iit, -tottax)
+# ht(xigc)
+# subset(dfs, stabbr=="AK" & date=="1963-01-01" & valtype=="value") # ah, there is no "tottax" before 1977-01-01 
+# count(subset(dfs, stabbr=="NY" & valtype=="value"), c("vname", "date"))
 
-dfr <- dfs %>% group_by(valtype, region, vname, level, date) %>%
+# create region-level summaries and add them to the data before calcing pdiff and pchya
+dfs2 <- rbind.fill(dfs, xigc)
+rm(dfs, xigc)
+
+dfr <- dfs2 %>% group_by(valtype, region, vname, level, date) %>%
   summarise(taxval=sum(taxval, na.rm=TRUE)) %>%
   mutate(geotype="region")
 
-dfl <- rbind.fill(dfs, dfr)
+dfl <- rbind.fill(dfs2, dfr)
+rm(dfs2, dfr)
 
 idx <- with(dfl, match(paste(geotype, region, stabbr, "2007-10-01", level, valtype, vname),
                        paste(geotype, region, stabbr, date, level, valtype, vname)))
