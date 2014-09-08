@@ -106,5 +106,11 @@ qplot(date, pdiff, data=dfl %>%
         filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
         colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
 
+st <- "NJ"
+sts <- c(st, nb[nb$stabbr==st, "nstabbr"])
+qplot(date, pdiff, data=dfl %>%
+        filter(stabbr %in% sts & level=="sg" & date>="2007-10-01" & vname %in% txs & valtype=="rvalma4"),
+        colour=stabbr, geom=c("point", "line")) + geom_hline(y=0)
+
 ```
 
