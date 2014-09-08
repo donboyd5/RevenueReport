@@ -4,4 +4,146 @@ author: "Don Boyd"
 
 ---
 
+```{r mapsetup, echo=FALSE, warning=FALSE}
+# supress warnings that we'll get from windowsFonts
+# Lucida Sans Typewriter is a monspace font, and I want a good monospace font for maps
+windowsFonts(mono2=windowsFont("TT Lucida Sans Typewriter")) # default mono is Courier - associate mono2 with my preferred monospace 
+
+map48 <- map_data("state")
+map48$stabbr <- as.character(factor(map48$region, levels=tolower(stcodes$stname), labels=stcodes$stabbr))
+# ht(map48)
+
+# construct data frame with state centers and stabbr to annotate the map
+# with a dummy group variable on the file so ggplot does not get confused, since we are using group in these maps
+stabbrmaplabels <- data.frame(state.center, stabbr=state.abb, group=1) %>%
+  filter(!stabbr %in% c("AK", "HI"))
+
+```
+
+
+# Maps
+## Map: percent change in total tax revenue vs. year ago
+```{r, echo=FALSE, fig.width=10, fig.height=8, warning=FALSE}
+# supress warnings that we'll get from windowsFonts
+# a single map
+pdata <- dfl %>% filter(level=="sg" & geotype=="state" & stabbr %in% state.abb & vname=="tottax" & date==lq & valtype=="value") %>%
+  select(stabbr, value=pchya)
+mapdata <- merge(pdata, map48, by="stabbr")
+mapdata <- arrange(mapdata, order) # keep data sorted by polygon order
+# brks<-cut(mapdata$value,c(min(mapdata$value,na.rm=TRUE),4,8,0,2,8,max(mapdata$value,na.rm=TRUE)),include.lowest=TRUE)
+# brks<-cut_number(mapdata$pdiffrsum4, 5) # use this for equal intervals
+# brks <- cut(mapdata$pchya, c1, include.lowest=TRUE)
+cutpts <- c(min(mapdata$value, na.rm=TRUE), -4, -8, 0, 4, 8, max(mapdata$value, na.rm=TRUE))
+brks <- cut(mapdata$value, cutpts, include.lowest=TRUE)
+
+fam <- "mono2" # font family to use for map annotation: serif mono sans 
+
+p <- ggplot(mapdata, aes(x=long, y=lat, group=group)) +
+  geom_polygon(aes(fill=brks)) + # discrete groups according to break groups determined above
+  geom_path(colour="gray", linestyle=2) +
+  coord_map() + scale_fill_brewer('% change', palette="RdBu") + # RdBu Reds Oranges RdPu YlOrBr OrRd
+  geom_text(data=stabbrmaplabels, aes(x=x, y=y, label=stabbr), colour="black", size=4, family=fam) # keep the font the same as annotate
+
+p <- p + labs(x="Source: Rockefeller Institute analysis of data from Census Bureau and states") +
+  theme(axis.title.x=element_text(size=14, face="bold", colour="black")) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+p <- p + labs(y="") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
+p <- p + labs(title="Percent change in total tax revenue versus year ago") +
+  theme(plot.title=element_text(size=16, face="bold")) # size: use number, or relative: rel(2)
+
+# add annotation for AK and HI
+AK <- subset(pdata, stabbr=="AK")$value
+HI <- subset(pdata, stabbr=="HI")$value
+AKnum <- formatC(AK, format="f", digits=1)
+HInum <- formatC(HI, format="f", digits=1)
+# pad the shorter of the two strings so that they are of equal length
+AKtxt <- paste0("AK: ", str_dup(" ", max(nchar(HInum) - nchar(AKnum), 0)), AKnum)
+HItxt <- paste0("HI: ", str_dup(" ", max(nchar(AKnum) - nchar(HInum), 0)), HInum)
+
+p + annotate("text", x=min(mapdata$long) + 1, y=min(mapdata$lat) + 3.5, label=AKtxt, family=fam, hjust=0.5, size=4) +
+    annotate("text", x=min(mapdata$long) + 1, y=min(mapdata$lat) + 2,   label=HItxt, family=fam, hjust=0.5, size=4)
+
+```
+
+
+## Facet-wrap map: percent change in total tax revenue vs. year ago
+```{r, echo=FALSE, fig.width=10, fig.height=8}
+pdata <- dfl %>% filter(level=="sg" & geotype=="state" & stabbr %in% state.abb & vname=="tottax" &
+                          date>="2007-01-01" & valtype=="value") %>%
+  select(date, stabbr, value=pchya)
+mapdata <- merge(pdata, map48, by="stabbr")
+mapdata <- arrange(mapdata, date, order) # keep data sorted by polygon order, within quarter
+cutpts <- c(min(mapdata$value, na.rm=TRUE), -4, -8, 0, 4, 8, max(mapdata$value, na.rm=TRUE))
+brks <- cut(mapdata$value, cutpts, include.lowest=TRUE)
+
+p <- ggplot(mapdata, aes(x=long, y=lat, group=group)) +
+  geom_polygon(aes(fill=brks)) + # discrete groups according to break groups determined above
+  geom_path(colour="gray", linestyle=2) +
+  coord_map() + scale_fill_brewer('% change', palette='RdBu')
+# geom_text(data=stabbrmaplabels, aes(x=x, y=y, label=stabbr), colour="black",size=4) +
+
+p <- p + labs(x="Source: Rockefeller Institute analysis of data from Census Bureau and states") +
+  theme(axis.title.x=element_text(size=14, face="bold", colour="black")) +
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+p <- p + labs(y="") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
+p <- p + labs(title="Percent change vs. year ago, total tax revenue") +
+     theme(plot.title=element_text(size=16, face="bold")) # size: use number, or relative: rel(2)
+q <- p + facet_wrap(~date, ncol=4)
+q
+
+```
+
+
+
+
+```{r, echo=FALSE, eval=FALSE}
+mapdata<-merge(pdata, map48, by="stabbr")
+mapdata<-arrange(mapdata, fyear,order) # keep data sorted by polygon order
+brks<-cut(mapdata$pcterr,c(min(mapdata$pcterr,na.rm=TRUE),-4,-2,0,2,4,max(mapdata$pcterr,na.rm=TRUE)),include.lowest=TRUE)
+brks<-cut(mapdata$pcterr,c(min(mapdata$pcterr,na.rm=TRUE),-6,-2,0,2,6,max(mapdata$pcterr,na.rm=TRUE)),include.lowest=TRUE)
+brks<-cut(mapdata$pcterr,c(min(mapdata$pcterr,na.rm=TRUE),-8,-2,0,2,8,max(mapdata$pcterr,na.rm=TRUE)),include.lowest=TRUE)
+# brks<-cut_number(mapdata$pdiffrsum4, 5) # use this for equal intervals
+p<-ggplot(mapdata, aes(x=long, y=lat, group=group)) +
+  geom_polygon(aes(fill=brks)) + # discrete groups according to break groups determined above
+  geom_path(colour="gray", linestyle=2)+
+  coord_map() + scale_fill_brewer('% change', palette='RdBu')
+# geom_text(data=stabbrmaplabels, aes(x=x, y=y, label=stabbr), colour="black",size=4) +
+p<-p+labs(x="Source: NASBO Fall Fiscal Survey, various years")+
+  theme(axis.title.x=element_text(size=14, face="bold", colour="black"))+
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+p<-p+labs(y="")+theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
+p<-p+labs(title="% forecast error for sum of 3 major taxes, 1987-2013")+
+  theme(plot.title=element_text(size=16, face="bold")) # size: use number, or relative: rel(2)
+q<-p+facet_wrap(~fyear,ncol=5)
+q
+
+```
+
+
+
+```{r facet, echo=FALSE, eval=FALSE}
+
+# now try to do pchya efficiently, separating data from mapdata ####
+map48<-map_data("state")
+map48$stabbr<-as.character(factor(map48$region,levels=tolower(stname), labels=stabbr))
+head(map48)
+
+gd2<-merge(subset(map48,select=-c(region,subregion)),grdat) # this can take some time because of all of the polygon info in map48
+gd2<-gd2[order(gd2$date,gd2$order),] # this appears necessary
+gd2$varf<-paste0(getyear(gd2$date),"q",qtr(gd2$date))
+gd2$date<-as.character(gd2$date) # this also appears necessary
+
+gd2$brks<-cut(gd2$pdiff,c(min(gd2$pdiff,na.rm=TRUE),-6,-3,0,3,6,max(gd2$pdiff,na.rm=TRUE)),include.lowest=TRUE)
+p<-ggplot(gd2, aes(long,lat,fill=brks)) # the data  
+p<-p+geom_polygon(aes(group=group))+coord_map() # use polygons (a map) and a better projection (coord_map())
+p<-p+scale_fill_brewer("% change", palette="RdBu") # choose good colors
+p<-p+theme(axis.text.x=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank()) # clean axes
+p<-p+xlab("")+ylab("")
+#p+facet_wrap(~date)
+q<-p+facet_wrap(~varf,ncol=4)
+q<-q+labs(title="Real per-capita state tax revenue, percent difference from recession start")
+
+```
 

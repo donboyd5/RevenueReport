@@ -42,6 +42,8 @@ library(tidyr)
 library(dplyr) # always load AFTER plyr
 library(knitr)
 library(lubridate)
+library(stringr)
+library(grDevices)
 
 # sessionInfo()
 
@@ -126,7 +128,12 @@ lq <- max(dfl$date)
 
 
 
-```{r intro, child=paste0("subIntro.Rmd"), eval=TRUE}
+```{r intro, child=paste0("subIntro.rmd"), eval=TRUE}
+# don't put anything else here - it WILL NOT BE RUN!
+```
+
+
+```{r maps, child=paste0("subMaps.rmd"), eval=TRUE}
 # don't put anything else here - it WILL NOT BE RUN!
 ```
 
